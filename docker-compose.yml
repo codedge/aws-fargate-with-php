@@ -1,0 +1,24 @@
+version: '3.4'
+
+services:
+  php-fpm:
+    build:
+      context: .
+      target: laravelapp_php
+
+  nodejs:
+    build:
+      context: .
+      target: laravelapp_nodejs
+    depends_on:
+      - php-fpm
+
+  nginx:
+    build:
+      context: .
+      target: laravelapp_nginx
+    depends_on:
+      - php-fpm
+      - nodejs
+    ports:
+      - "80:80"

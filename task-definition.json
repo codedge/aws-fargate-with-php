@@ -1,0 +1,89 @@
+{
+    "family": "laravel-backend-app",
+    "containerDefinitions": [
+        {
+            "name": "nginx",
+            "image": "",
+            "portMappings": [
+                {
+                    "containerPort": 80,
+                    "hostPort": 80,
+                    "protocol": "tcp"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "laravelapp-nginx",
+                    "awslogs-region": "eu-north-1",
+                    "awslogs-stream-prefix": "laravel-backend-app"
+                }
+            },
+            "dependsOn": [
+                {
+                    "containerName": "php-fpm",
+                    "condition": "START"
+                }
+            ],
+            "essential": true
+        },
+        {
+            "name": "php-fpm",
+            "image": "",
+            "portMappings": [
+                {
+                    "containerPort": 9000
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "laravelapp-php-fpm",
+                    "awslogs-region": "eu-north-1",
+                    "awslogs-stream-prefix": "laravel-backend-app"
+                }
+            },
+            "secrets": [
+                {
+                    "name": "APP_ENV",
+                    "valueFrom": "laravelapp_app_env"
+                },
+                {
+                    "name": "APP_DEBUG",
+                    "valueFrom": "laravelapp_app_debug"
+                },
+                {
+                    "name": "APP_KEY",
+                    "valueFrom": "laravelapp_app_key"
+                }
+            ],
+            "essential": true
+        },
+        {
+            "name": "nodejs",
+            "image": "",
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "laravelapp-nodejs",
+                    "awslogs-region": "eu-north-1",
+                    "awslogs-stream-prefix": "laravel-backend-app"
+                }
+            },
+            "dependsOn": [
+                {
+                    "containerName": "php-fpm",
+                    "condition": "START"
+                }
+            ],
+            "essential": true
+        }
+    ],
+    "executionRoleArn": "ecsTaskExecutionRole",
+    "cpu": "2048",
+    "memory": "4096",
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": [
+        "FARGATE"
+    ]
+}
